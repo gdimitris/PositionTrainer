@@ -1,4 +1,4 @@
-package com.example.dimitris.pgnparser;
+package com.example.dimitris.chesspositiontrainer;
 
 import android.util.Log;
 
@@ -22,7 +22,7 @@ public class PGNReader {
         Pattern info_pattern = Pattern.compile("\\[[^\\]]*\\]");
         Pattern whitespace_pattern = Pattern.compile("^\\s*$");
         Pattern move_number_pattern = Pattern.compile("^\\d{1,2}\\.");
-        ArrayList<String> movesList = new ArrayList<String>();
+        ArrayList<String> movesList = new ArrayList<>();
 
         try {
             while ((line = reader.readLine()) != null) {
