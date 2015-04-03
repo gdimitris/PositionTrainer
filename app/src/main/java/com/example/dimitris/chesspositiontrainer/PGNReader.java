@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  */
 public class PGNReader {
 
-    public void readFile(InputStream inputStream){
+    public void readFile(InputStream inputStream) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         Pattern info_pattern = Pattern.compile("\\[[^\\]]*\\]");
@@ -25,20 +25,20 @@ public class PGNReader {
         ArrayList<String> movesList = new ArrayList<String>();
 
         try {
-            while( (line = reader.readLine()) != null ){
+            while ((line = reader.readLine()) != null) {
 
                 Matcher info_matcher = info_pattern.matcher(line);
                 Matcher whitespace_matcher = whitespace_pattern.matcher(line);
-                if (info_matcher.find()){
-                    Log.e("PGN Reading","I got info line : " + line);
-                } else if (whitespace_matcher.find()){
-                    Log.e("PGN Reading","I got whitespace");
+                if (info_matcher.find()) {
+                    Log.e("PGN Reading", "I got info line : " + line);
+                } else if (whitespace_matcher.find()) {
+                    Log.e("PGN Reading", "I got whitespace");
                 } else {
                     StringTokenizer tokenizer = new StringTokenizer(line);
-                    while (tokenizer.hasMoreTokens()){
+                    while (tokenizer.hasMoreTokens()) {
                         String token = tokenizer.nextToken();
                         Matcher move_number_matcher = move_number_pattern.matcher(token);
-                        if(!move_number_matcher.matches()){
+                        if (!move_number_matcher.matches()) {
                             movesList.add(token);
                         }
                     }
@@ -48,6 +48,6 @@ public class PGNReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.e("PGN Reading","The whole list is: "+ movesList.toString());
+        Log.e("PGN Reading", "The whole list is: " + movesList.toString());
     }
 }
