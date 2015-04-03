@@ -6,8 +6,10 @@ package com.example.dimitris.chesspositiontrainer;
 public class Square {
 
     public String name;
+    public Piece piece;
 
-    public Square(String name){
-
+    public Square(String name) {
+        this.name = name;
+        this.piece = new NullPiece();
     }
 }
