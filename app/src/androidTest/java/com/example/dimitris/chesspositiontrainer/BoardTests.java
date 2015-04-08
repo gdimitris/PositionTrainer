@@ -54,7 +54,7 @@ public class BoardTests extends TestCase {
     }
 
     public void testCanInitializeFromFEN() {
-        board = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        setUpInitialPositionFromFEN();
 
         Piece blackRook = board.getPieceAt("h8");
         assertEquals(blackRook.color, PieceColor.Black);
@@ -101,5 +101,62 @@ public class BoardTests extends TestCase {
         assertEquals(whiteKing.type, PieceType.King);
     }
 
+    public void testBoardCanPerformMoveE2E4(){
+        setUpInitialPositionFromFEN();
+        Move move = new Move("e2","e4");
+        board.performMove(move);
+
+        Piece pieceAtE4 = board.getPieceAt("e4");
+        assertEquals(PieceColor.White, pieceAtE4.color);
+        assertEquals(PieceType.Pawn, pieceAtE4.type);
+
+        Piece pieceAtE2 = board.getPieceAt("e2");
+        assertEquals(PieceColor.None, pieceAtE2.color);
+        assertEquals(PieceType.None, pieceAtE2.type);
+    }
+
+    public void testBoardCanPerformMoveNf3(){
+        setUpInitialPositionFromFEN();
+        Move move = new Move("g1","f3");
+        board.performMove(move);
+
+        Piece pieceAtF3 = board.getPieceAt("f3");
+        assertEquals(PieceColor.White, pieceAtF3.color);
+        assertEquals(PieceType.Knight, pieceAtF3.type);
+
+        Piece pieceAtG1 = board.getPieceAt("g1");
+        assertEquals(PieceColor.None, pieceAtG1.color);
+        assertEquals(PieceType.None, pieceAtG1.type);
+    }
+
+    public void testBoardCanPerformCapture(){
+        setUpInitialPositionFromFEN();
+        Move move1 = new Move("d2","d4");
+        Move move2 = new Move("e7","e5");
+        Move move3 = new Move("d4","e5");
+        board.performMove(move1);
+        board.performMove(move2);
+        board.performMove(move3);
+
+        Piece pieceAtE5 = board.getPieceAt("e5");
+        assertEquals(PieceColor.White,pieceAtE5.color);
+        assertEquals(PieceType.Pawn,pieceAtE5.type);
+
+        Piece pieceAtD2 = board.getPieceAt("d2");
+        assertEquals(PieceColor.None, pieceAtD2.color);
+        assertEquals(PieceType.None, pieceAtD2.type);
+
+        Piece pieceAtD4 = board.getPieceAt("d4");
+        assertEquals(PieceColor.None, pieceAtD4.color);
+        assertEquals(PieceType.None, pieceAtD4.type);
+
+        Piece pieceAtE7 = board.getPieceAt("e7");
+        assertEquals(PieceColor.None, pieceAtE7.color);
+        assertEquals(PieceType.None, pieceAtE7.type);
+    }
+
+    private void setUpInitialPositionFromFEN() {
+        board = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    }
 
 }

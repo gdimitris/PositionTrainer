@@ -20,7 +20,6 @@ public class Board {
     public Board(String FEN) {
         initializeBoard();
         initializeBoard(FEN);
-        printBoard();
     }
 
     private void initializeBoard(String FEN) {
@@ -106,7 +105,16 @@ public class Board {
             for (int col = 0; col < 8; col++) {
                 System.out.print(board[row][col].piece.toString());
             }
-            System.out.println();
+            System.out.println("");
         }
+        System.out.println("");
+    }
+
+    public void performMove(Move move) {
+        Square source = getSquareAt(move.sourceSquare);
+        Square destination = getSquareAt(move.destinationSquare);
+
+        destination.piece = source.piece;
+        source.piece = new NullPiece();
     }
 }
