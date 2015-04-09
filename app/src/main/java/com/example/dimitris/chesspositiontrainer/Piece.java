@@ -18,6 +18,7 @@ public class Piece {
     public static final String Black_Bishop_Unicode = "\u265D";
     public static final String Black_Knight_Unicode = "\u265E";
     public static final String Black_Pawn_Unicode = "\u265F";
+
     public PieceType type;
     public PieceColor color;
 
@@ -28,4 +29,37 @@ public class Piece {
     public enum PieceColor {
         None, White, Black
     }
+
+    public static Piece create(char pieceChar){
+        PieceColor color = (Character.isUpperCase(pieceChar)) ? PieceColor.White : PieceColor.Black;
+        pieceChar = Character.toLowerCase(pieceChar);
+
+        switch (pieceChar) {
+            case 'r':
+                return new Rook(color);
+            case 'b':
+                return new Bishop(color);
+            case 'n':
+                return new Knight(color);
+            case 'q':
+                return new Queen(color);
+            case 'k':
+                return new King(color);
+            case 'p':
+                return new Pawn(color);
+            default:
+                return new NullPiece();
+        }
+    }
+
+    public static Piece create(String pieceType){
+        Piece piece = new NullPiece();
+        try {
+            piece =  (Piece) Class.forName(pieceType).newInstance();
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
+        return piece;
+    }
+
 }
