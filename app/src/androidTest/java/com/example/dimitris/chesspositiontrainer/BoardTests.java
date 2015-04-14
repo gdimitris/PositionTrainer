@@ -135,25 +135,50 @@ public class BoardTests extends TestCase {
         Move move2 = new Move("e7","e5");
         Move move3 = new Move("d4","e5");
         board.performMove(move1);
+        System.out.println(board.toString());
+
         board.performMove(move2);
+        System.out.println(board.toString());
+
         board.performMove(move3);
+        System.out.println(board.toString());
 
         Piece pieceAtE5 = board.getPieceAt("e5");
-        assertEquals(PieceColor.White,pieceAtE5.color);
-        assertEquals(PieceType.Pawn,pieceAtE5.type);
+        assertEquals(PieceColor.White, pieceAtE5.color);
+        assertEquals(PieceType.Pawn, pieceAtE5.type);
+
 
         Piece pieceAtD2 = board.getPieceAt("d2");
         assertEquals(PieceColor.None, pieceAtD2.color);
         assertEquals(PieceType.None, pieceAtD2.type);
 
+
+
         Piece pieceAtD4 = board.getPieceAt("d4");
         assertEquals(PieceColor.None, pieceAtD4.color);
         assertEquals(PieceType.None, pieceAtD4.type);
 
+
         Piece pieceAtE7 = board.getPieceAt("e7");
         assertEquals(PieceColor.None, pieceAtE7.color);
         assertEquals(PieceType.None, pieceAtE7.type);
+
     }
+
+    public void testToString(){
+        setUpInitialPositionFromFEN();
+        String expected =   "♜♞♝♛♚♝♞♜\n" +
+                            "♟♟♟♟♟♟♟♟\n" +
+                            "........\n" +
+                            "........\n" +
+                            "........\n" +
+                            "........\n" +
+                            "♙♙♙♙♙♙♙♙\n" +
+                            "♖♘♗♕♔♗♘♖\n";
+
+        assertEquals(expected,board.toString());
+    }
+
 
     private void setUpInitialPositionFromFEN() {
         board = new Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");

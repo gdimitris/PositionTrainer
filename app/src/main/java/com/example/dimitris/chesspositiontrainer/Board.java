@@ -54,14 +54,17 @@ public class Board {
         return rows.indexOf(row);
     }
 
-    public void printBoard() {
+    @Override
+    public String toString() {
+        String toReturn="";
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                System.out.print(board[row][col].piece.toString());
+               toReturn+=board[row][col].piece.toString();
             }
-            System.out.println("");
+            toReturn+="\n";
         }
-        System.out.println("");
+
+        return toReturn;
     }
 
     public void performMove(Move move) {
