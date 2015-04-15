@@ -1,31 +1,34 @@
 package com.example.dimitris.chesspositiontrainer;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import static com.example.dimitris.chesspositiontrainer.Piece.PieceColor;
 import static com.example.dimitris.chesspositiontrainer.Piece.PieceType;
+import static junit.framework.TestCase.assertEquals;
 
 
 /**
  * Created by dimitris on 3/28/15.
  */
-public class BoardTests extends TestCase {
+
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, emulateSdk = 21)
+public class BoardTests {
 
     private Board board;
     private Piece piece;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         board = new Board();
         piece = new Piece();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testGetsCorrectSquares() {
         Square e4square = board.getSquareAt("e4");
         assertEquals("e4", e4square.name);
@@ -43,16 +46,19 @@ public class BoardTests extends TestCase {
         assertEquals("b7", b7square.name);
     }
 
+    @Test
     public void testGetsPieceAtE4() {
         board.setPieceAtSquare(piece, "e4");
         assertEquals(piece, board.getPieceAt("e4"));
     }
 
+    @Test
     public void testGetsPieceAtD8() {
         board.setPieceAtSquare(piece, "d8");
         assertEquals(piece, board.getPieceAt("d8"));
     }
 
+    @Test
     public void testCanInitializeFromFEN() {
         setUpInitialPositionFromFEN();
 
@@ -101,6 +107,7 @@ public class BoardTests extends TestCase {
         assertEquals(whiteKing.type, PieceType.King);
     }
 
+    @Test
     public void testBoardCanPerformMoveE2E4(){
         setUpInitialPositionFromFEN();
         Move move = new Move("e2","e4");
@@ -115,6 +122,7 @@ public class BoardTests extends TestCase {
         assertEquals(PieceType.None, pieceAtE2.type);
     }
 
+    @Test
     public void testBoardCanPerformMoveNf3(){
         setUpInitialPositionFromFEN();
         Move move = new Move("g1","f3");
@@ -129,6 +137,7 @@ public class BoardTests extends TestCase {
         assertEquals(PieceType.None, pieceAtG1.type);
     }
 
+    @Test
     public void testBoardCanPerformCapture(){
         setUpInitialPositionFromFEN();
         Move move1 = new Move("d2","d4");
@@ -165,6 +174,7 @@ public class BoardTests extends TestCase {
 
     }
 
+    @Test
     public void testToString(){
         setUpInitialPositionFromFEN();
         String expected =   "♜♞♝♛♚♝♞♜\n" +
