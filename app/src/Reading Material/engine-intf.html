@@ -1,0 +1,1922 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>engine-intf.html</title>
+<style type="text/css">
+.enscript-comment { font-style: italic; color: rgb(178,34,34); }
+.enscript-function-name { font-weight: bold; color: rgb(0,0,255); }
+.enscript-variable-name { font-weight: bold; color: rgb(184,134,11); }
+.enscript-keyword { font-weight: bold; color: rgb(160,32,240); }
+.enscript-reference { font-weight: bold; color: rgb(95,158,160); }
+.enscript-string { font-weight: bold; color: rgb(188,143,143); }
+.enscript-builtin { font-weight: bold; color: rgb(218,112,214); }
+.enscript-type { font-weight: bold; color: rgb(34,139,34); }
+.enscript-highlight { text-decoration: underline; color: 0; }
+</style>
+</head>
+<body id="top">
+<h1 style="margin:8px;" id="f1">engine-intf.html&nbsp;&nbsp;&nbsp;<span style="font-weight: normal; font-size: 0.5em;">[<a href="?txt">plain text</a>]</span></h1>
+<hr/>
+<div></div>
+<pre>
+<span class="enscript-keyword">&lt;!DOCTYPE HTML PUBLIC </span><span class="enscript-string">&quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;</span><span class="enscript-keyword"> </span><span class="enscript-string">&quot;<a href="http://www.w3.org/TR/REC-html40/loose.dtd">http://www.w3.org/TR/REC-html40/loose.dtd</a>&quot;</span><span class="enscript-keyword">&gt;</span> 
+<span class="enscript-keyword">&lt;html&gt;</span>
+<span class="enscript-keyword">&lt;head&gt;</span>
+<span class="enscript-keyword">&lt;title&gt;</span>Chess Engine Communication Protocol<span class="enscript-keyword">&lt;/title&gt;</span>
+<span class="enscript-keyword">&lt;/head&gt;</span>
+
+<span class="enscript-keyword">&lt;body&gt;</span>
+<span class="enscript-keyword">&lt;hr noshade size=</span><span class="enscript-string">&quot;2&quot;</span><span class="enscript-keyword">&gt;</span>
+<span class="enscript-keyword">&lt;h1&gt;</span>Chess Engine Communication Protocol<span class="enscript-keyword">&lt;/h1&gt;</span>
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;<a href="http://www.tim-mann.org/">http://www.tim-mann.org/</a>&quot;</span><span class="enscript-keyword">&gt;</span>Tim Mann<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+$Id: engine-intf.html,v 1.1 2002/08/22 23:47:04 neeri Exp $<span class="enscript-keyword">&lt;br&gt;</span>
+Version 2; implemented in xboard/WinBoard 4.2.1 and later.<span class="enscript-keyword">&lt;br&gt;</span>
+Changes since version 1 are indicated in <span class="enscript-keyword">&lt;font color=red&gt;</span>red<span class="enscript-keyword">&lt;/font&gt;</span>.
+<span class="enscript-keyword">&lt;hr noshade size=</span><span class="enscript-string">&quot;2&quot;</span><span class="enscript-keyword">&gt;</span>
+
+<span class="enscript-keyword">&lt;ul&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#1&quot;</span><span class="enscript-keyword">&gt;</span>1. Introduction<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#2&quot;</span><span class="enscript-keyword">&gt;</span>2. Connection<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#3&quot;</span><span class="enscript-keyword">&gt;</span>3. Debugging<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#4&quot;</span><span class="enscript-keyword">&gt;</span>4. How it got this way<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#5&quot;</span><span class="enscript-keyword">&gt;</span>5. WinBoard requires Win32 engines<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#6&quot;</span><span class="enscript-keyword">&gt;</span>6. Hints on input/output<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#7&quot;</span><span class="enscript-keyword">&gt;</span>7. Interrupts<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#8&quot;</span><span class="enscript-keyword">&gt;</span>8. Commands from xboard to the engine<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#9&quot;</span><span class="enscript-keyword">&gt;</span>9. Commands from the engine to xboard<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#10&quot;</span><span class="enscript-keyword">&gt;</span>10. Thinking Output<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#11&quot;</span><span class="enscript-keyword">&gt;</span>11. Time control<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#12&quot;</span><span class="enscript-keyword">&gt;</span>12. Analyze Mode<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#13&quot;</span><span class="enscript-keyword">&gt;</span>13. Idioms and backward compatibility features<span class="enscript-keyword">&lt;/a&gt;</span>
+<span class="enscript-keyword">&lt;/ul&gt;</span>
+
+<span class="enscript-keyword">&lt;hr noshade size=</span><span class="enscript-string">&quot;2&quot;</span><span class="enscript-keyword">&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;1&quot;</span><span class="enscript-keyword">&gt;</span>1. Introduction<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+This document is a set of rough notes on the protocol that xboard and
+WinBoard use to communicate with gnuchessx and other chess engines.
+These notes may be useful if you want to connect a different chess
+engine to xboard.  Throughout the notes, &quot;xboard&quot; means both xboard
+and WinBoard except where they are specifically contrasted.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+There are two reasons I can imagine someone wanting to do this: 
+<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;ol&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span>You have, or are developing, a chess engine but you don't want to
+write your own graphical interface. 
+<span class="enscript-keyword">&lt;li&gt;</span>You have, or are developing,a chess engine, and you want to
+interface it to the Internet Chess Server.
+<span class="enscript-keyword">&lt;/ol&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+In case (2), if you are using xboard, you will need to configure the
+&quot;Zippy&quot; code into it, but WinBoard includes this code already.  See
+the file <span class="enscript-keyword">&lt;a
+href=</span><span class="enscript-string">&quot;<a href="http://www.tim-mann.org/xboard/zippy.README">http://www.tim-mann.org/xboard/zippy.README</a>&quot;</span><span class="enscript-keyword">&gt;</span>zippy.README<span class="enscript-keyword">&lt;/a&gt;</span>
+in the xboard or WinBoard distribution for more information.
+
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+These notes are unpolished, but I've attempted to make them complete
+in this release.  If you notice any errors, omissions, or misleading
+statements, let me know.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+I'd like to hear from everyone who is trying to interface their own
+chess engine to xboard/WinBoard.  Please email me,
+tim<span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;nospam&quot;</span><span class="enscript-keyword">&gt;</span>@<span class="enscript-keyword">&lt;/a&gt;</span>tim-mann.org.  Also, please join
+the mailing list for authors of xboard/WinBoard compatible chess
+engines.  The list is now hosted by Yahoo Groups; you can join at <span class="enscript-keyword">&lt;a
+href=</span><span class="enscript-string">&quot;<a href="http://www.egroups.com/group/chess-engines">http://www.egroups.com/group/chess-engines</a>&quot;</span><span class="enscript-keyword">
+&gt;</span><a href="http://www.egroups.com/group/chess-engines">http://www.egroups.com/group/chess-engines</a><span class="enscript-keyword">&lt;/a&gt;</span>, or you can read the
+list there without joining.  The list is filtered to prevent spam.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;2&quot;</span><span class="enscript-keyword">&gt;</span>2. Connection<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+An xboard chess engine runs as a separate process from xboard itself,
+connected to xboard through a pair of anonymous pipes.  The engine
+does not have to do anything special to set up these pipes.  xboard
+sets up the pipes itself and starts the engine with one pipe as its
+standard input and the other as its standard output.  The engine then
+reads commands from its standard input and writes responses to its
+standard output.  This is, unfortunately, a little more complicated to
+do right than it sounds; see <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#6&quot;</span><span class="enscript-keyword">&gt;</span>section 6<span class="enscript-keyword">&lt;/a&gt;</span> below.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+And yes, contrary to some people's expectations, exactly the same
+thing is true for WinBoard.  Pipes and standard input/output are
+implemented in Win32 and work fine.  You don't have to use DDE, COM,
+DLLs, BSOD, or any of the other infinite complexity that
+Microsoft has created just to talk between two programs.  A WinBoard
+chess engine is a Win32 console program that simply reads from its
+standard input and writes to its standard output.  See sections 
+<span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#5&quot;</span><span class="enscript-keyword">&gt;</span>5<span class="enscript-keyword">&lt;/a&gt;</span> and <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#6&quot;</span><span class="enscript-keyword">&gt;</span>6<span class="enscript-keyword">&lt;/a&gt;</span> below for additional details.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;3&quot;</span><span class="enscript-keyword">&gt;</span>3. Debugging<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+To diagnose problems in your engine's interaction with xboard, use the
+-debug flag on xboard's command line to see the messages that are
+being exchanged.  In WinBoard, these messages are written to the file
+WinBoard.debug instead of going to the screen.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+You can turn debug mode on or off while WinBoard is running by
+pressing Ctrl+Alt+F12.  You can turn debug mode on or off while xboard
+is running by binding DebugProc to a shortcut key (and pressing the
+key!); see the instructions on shortcut keys in the xboard man page.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+While your engine is running under xboard/WinBoard, you can send a
+command directly to the engine by pressing Shift+1 (xboard) or Alt+1
+(WinBoard 4.0.3 and later).  This brings up a dialog that you can type
+your command into.  Press Shift+2 (Alt+2) instead to send to the
+second chess engine in Two Machines mode.  On WinBoard 4.0.2 and earlier,
+Ctrl+Alt is used in place of Alt; this had to be changed due to a conflict
+with typing the @-sign on some European keyboards.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;4&quot;</span><span class="enscript-keyword">&gt;</span>4. How it got this way<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Originally, xboard was just trying to talk to the existing
+command-line interface of GNU Chess 3.1+ and 4, which was designed
+for people to type commands to.  So the communication protocol is very
+ad-hoc.  It might have been good to redesign it early on, but because
+xboard and GNU Chess are separate programs, I didn't want to force
+people to upgrade them together to versions that matched.  I
+particularly wanted to keep new versions of xboard working with old
+versions of GNU Chess, to make it easier to compare the play of old
+and new gnuchess versions.  I didn't foresee the need for a clean
+protocol to be used with other chess engines in the future.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Circumstances have changed over the years, and now there are many more
+engines that work with xboard.  I've had to make the protocol
+description more precise, I've added some features that GNU Chess
+does not support, and I've specified the standard semantics of a few
+features to be slightly different from what GNU Chess 4 does.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+This release of the protocol specification is the first to carry a
+version number of its own -- version 2.  Previous releases simply
+carried a last-modified date and were loosely tied to specific 
+releases of xboard and WinBoard.  The version number &quot;1&quot; applies
+generally to all those older versions of the protocol.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>Protocol version 2 remains compatible with older engines but has
+several new capabilities.  In particular, it adds the 
+&quot;feature&quot; command, a new mechanism for making backward-compatible
+changes and extensions to the protocol.  Engines that do not support a
+particular new feature do not have to use it; new features are not
+enabled unless the engine specifically requests them using the feature
+command.  If an engine does not send the feature command at all, the
+protocol behavior is nearly identical to version 1.  Several new
+features can be selected by the feature command in version 2,
+including the &quot;ping&quot; command (recommended for all engines), the
+&quot;setboard&quot; command, and many optional parameters.  Additional features
+will probably be added in future versions.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;5&quot;</span><span class="enscript-keyword">&gt;</span>5. WinBoard requires Win32 engines<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Due to some Microsoft brain damage that I don't understand, WinBoard
+does not work with chess engines that were compiled to use a DOS
+extender for 32-bit addressing.  (Probably not with 16-bit DOS or
+Windows programs either.)  WinBoard works only with engines that are
+compiled for the Win32 API.  You can get a free compiler that targets
+the Win32 API from <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;<a href="http://sources.redhat.com/cygwin/">http://sources.redhat.com/cygwin/</a>&quot;</span><span class="enscript-keyword">
+&gt;</span><a href="http://sources.redhat.com/cygwin/">http://sources.redhat.com/cygwin/</a><span class="enscript-keyword">&lt;/a&gt;</span>.  I think DJGPP 2.x should also
+work if you use the RSXNTDJ extension, but I haven't tried it.  Of
+course, Microsoft Visual C++ will work.  Most likely the other
+commercial products that support Win32 will work too (Borland, etc.),
+but I have not tried them.  Delphi has been successfully used to write
+engines for WinBoard; if you want to do this, Tony Werten has donated
+some <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;<a href="http://www.tim-mann.org/winboard/delphi.txt">http://www.tim-mann.org/winboard/delphi.txt</a>&quot;</span><span class="enscript-keyword"> &gt;</span>sample
+code<span class="enscript-keyword">&lt;/a&gt;</span> that should help you get started.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;6&quot;</span><span class="enscript-keyword">&gt;</span>6. Hints on input/output<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Beware of using buffered I/O in your chess engine.  The C stdio
+library, C++ streams, and the I/O packages in most other languages use
+buffering both on input and output.  That means two things.  First,
+when your engine tries to write some characters to xboard, the library
+stashes them in an internal buffer and does not actually write them to
+the pipe connected to xboard until either the buffer fills up or you
+call a special library routine asking for it to be flushed.  (In C
+stdio, this routine is named <span class="enscript-keyword">&lt;tt&gt;</span>fflush<span class="enscript-keyword">&lt;/tt&gt;</span>.)  Second, when your engine tries
+to read some characters from xboard, the library does not read just
+the characters you asked for -- it reads all the characters that are
+currently available (up to some limit) and stashes any characters you
+are not yet ready for in an internal buffer.  The next time you ask to
+read, you get the characters from the buffer (if any) before the
+library tries to read more data from the actual pipe.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Why does this cause problems?  First, on the output side, remember
+that your engine produces output in small quantities (say, a few
+characters for a move, or a line or two giving the current analysis),
+and that data always needs to be delivered to xboard/WinBoard for
+display immediately.  If you use buffered output, the data you print
+will sit in a buffer in your own address space instead of being
+delivered.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+You can usually fix the output buffering problem by asking for the
+buffering to be turned off.  In C stdio, you do this by calling
+<span class="enscript-keyword">&lt;tt&gt;</span>setbuf(stdout, NULL)<span class="enscript-keyword">&lt;/tt&gt;</span>.  A more laborious and error-prone
+method is to carefully call <span class="enscript-keyword">&lt;tt&gt;</span>fflush(stdout)<span class="enscript-keyword">&lt;/tt&gt;</span> after every line
+you output; I don't recommend this.  In C++, you can try
+<span class="enscript-keyword">&lt;tt&gt;</span>cout.setf(ios::unitbuf)<span class="enscript-keyword">&lt;/tt&gt;</span>, which is documented in current
+editions of &quot;The C++ Programming Language,&quot; but not older ones.
+Another C++ method that might work is
+<span class="enscript-keyword">&lt;tt&gt;</span>cout.rdbuf()-<span class="enscript-keyword">&amp;gt;</span>setbuf(NULL, 0)<span class="enscript-keyword">&lt;/tt&gt;</span>.  Alternatively, you can
+carefully call <span class="enscript-keyword">&lt;tt&gt;</span>cout.flush()<span class="enscript-keyword">&lt;/tt&gt;</span> after every line you output;
+again, I don't recommend this.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Another way to fix the problem is to use unbuffered operating system
+calls to write directly to the file descriptor for standard output.
+On Unix, this means <span class="enscript-keyword">&lt;tt&gt;</span>write(1, ...)<span class="enscript-keyword">&lt;/tt&gt;</span> -- see the man page for write(2).
+On Win32, you can use either the Unix-like <span class="enscript-keyword">&lt;tt&gt;</span>_write(1, ...)<span class="enscript-keyword">&lt;/tt&gt;</span> or Win32
+native routines like <span class="enscript-keyword">&lt;tt&gt;</span>WriteFile<span class="enscript-keyword">&lt;/tt&gt;</span>.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Second, on the input side, you are likely to want to poll during your
+search and stop it if new input has come in.  If you implement
+pondering, you'll need this so that pondering stops when the user
+makes a move.  You should also poll during normal thinking on your
+move, so that you can implement the &quot;?&quot; (move now) command, and so
+that you can respond promptly to a &quot;result&quot;, &quot;force&quot;, or &quot;quit&quot;
+command if xboard wants to end the game or terminate your engine.
+Buffered input makes polling more complicated -- when you poll, you
+must stop your search if there are <span class="enscript-keyword">&lt;em&gt;</span>either<span class="enscript-keyword">&lt;/em&gt;</span> characters in the buffer
+<span class="enscript-keyword">&lt;em&gt;</span>or<span class="enscript-keyword">&lt;/em&gt;</span> characters available from the underlying file descriptor.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+The most direct way to fix this problem is to use unbuffered operating
+system calls to read (and poll) the underlying file descriptor
+directly.  On Unix, use <span class="enscript-keyword">&lt;tt&gt;</span>read(0, ...)<span class="enscript-keyword">&lt;/tt&gt;</span> to read from standard input, and
+use <span class="enscript-keyword">&lt;tt&gt;</span>select()<span class="enscript-keyword">&lt;/tt&gt;</span> to poll it.  See the man pages read(2) and select(2).
+(Don't follow the example of GNU Chess 4 and use the FIONREAD ioctl to
+poll for input.  It is not very portable; that is, it does not exist
+on all versions of Unix, and is broken on some that do have it.)  On
+Win32, you can use either the Unix-like <span class="enscript-keyword">&lt;tt&gt;</span>_read(0, ...)<span class="enscript-keyword">&lt;/tt&gt;</span> or the native
+Win32 <span class="enscript-keyword">&lt;tt&gt;</span>ReadFile()<span class="enscript-keyword">&lt;/tt&gt;</span> to read.  Unfortunately, under Win32, the function to
+use for polling is different depending on whether the input device is
+a pipe, a console, or something else.  (More Microsoft brain damage
+here -- did they never hear of device independence?)  For pipes, you
+can use <span class="enscript-keyword">&lt;tt&gt;</span>PeekNamedPipe<span class="enscript-keyword">&lt;/tt&gt;</span> to poll (even when the pipe is unnamed).
+For consoles, 
+you can use <span class="enscript-keyword">&lt;tt&gt;</span>GetNumberOfConsoleInputEvents<span class="enscript-keyword">&lt;/tt&gt;</span>.  For sockets only, you can
+use <span class="enscript-keyword">&lt;tt&gt;</span>select()<span class="enscript-keyword">&lt;/tt&gt;</span>.  It might be possible to use
+<span class="enscript-keyword">&lt;tt&gt;</span>WaitForSingleObject<span class="enscript-keyword">&lt;/tt&gt;</span> more 
+generally, but I have not tried it.  Some code to do these things can
+be found in Crafty's utility.c, but I don't guarantee that it's all
+correct or optimal.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+A second way to fix the problem might be to ask your I/O library not
+to buffer on input.  It should then be safe to poll the underlying
+file descriptor as described above.  With C, you can try calling
+<span class="enscript-keyword">&lt;tt&gt;</span>setbuf(stdin, NULL)<span class="enscript-keyword">&lt;/tt&gt;</span>.  However, I have never tried this.  Also, there
+could be problems if you use <span class="enscript-keyword">&lt;tt&gt;</span>scanf()<span class="enscript-keyword">&lt;/tt&gt;</span>, at least with certain patterns,
+because <span class="enscript-keyword">&lt;tt&gt;</span>scanf()<span class="enscript-keyword">&lt;/tt&gt;</span> sometimes needs to read one extra character and &quot;push
+it back&quot; into the buffer; hence, there is a one-character pushback
+buffer even if you asked for stdio to be unbuffered.  With C++, you
+can try <span class="enscript-keyword">&lt;tt&gt;</span>cin.rdbuf()-<span class="enscript-keyword">&amp;gt;</span>setbuf(NULL, 0)<span class="enscript-keyword">&lt;/tt&gt;</span>, but again, I have never tried
+this.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+A third way to fix the problem is to check whether there are
+characters in the buffer whenever you poll.  C I/O libraries generally
+do not provide any portable way to do this.  Under C++, you can use
+<span class="enscript-keyword">&lt;tt&gt;</span>cin.rdbuf()-<span class="enscript-keyword">&amp;gt;</span>in_avail()<span class="enscript-keyword">&lt;/tt&gt;</span>.  This method has been reported to
+work with 
+EXchess.  Remember that if there are no characters in the buffer, you
+still have to poll the underlying file descriptor too, using the
+method described above.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+A fourth way to fix the problem is to use a separate thread to read
+from stdin.  This way works well if you are familiar with thread
+programming.  This thread can be blocked waiting for input to come in
+at all times, while the main thread of your engine does its thinking.
+When input arrives, you have the thread put the input into a buffer
+and set a flag in a global variable.  Your search routine then
+periodically tests the global variable to see if there is input to
+process, and stops if there is.  WinBoard and my Win32 ports of ICC
+timestamp and FICS timeseal use threads to handle multiple input
+sources.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;7&quot;</span><span class="enscript-keyword">&gt;</span>7. Signals<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>Engines that run on Unix need to be concerned with two Unix
+signals: <span class="enscript-keyword">&lt;tt&gt;</span>SIGTERM<span class="enscript-keyword">&lt;/tt&gt;</span> and <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span>.  This applies both to
+engines that run under xboard and (the unusual case of) engines that
+WinBoard remotely runs on a Unix host using the -firstHost or
+-secondHost feature.  It does not apply to engines that run on
+Windows, because Windows does not have Unix-style signals.
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+Beginning with version 2, you can now turn off the use of
+either or both
+signals.  See the &quot;feature&quot; command in <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#6&quot;</span><span class="enscript-keyword">&gt;</span>section 9<span class="enscript-keyword">&lt;/a&gt;</span> below.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>First, when an engine is sent the &quot;quit&quot; command, it is also given
+a <span class="enscript-keyword">&lt;tt&gt;</span>SIGTERM<span class="enscript-keyword">&lt;/tt&gt;</span> signal shortly afterward to make sure it goes away.
+If your engine reliably responds to &quot;quit&quot;, and the signal causes
+problems for you, you should either ignore it by calling
+<span class="enscript-keyword">&lt;tt&gt;</span>signal(SIGTERM, SIG_IGN)<span class="enscript-keyword">&lt;/tt&gt;</span> at the start of your program,
+or disable it with the &quot;feature&quot; command.<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>Second, xboard will send an interrupt signal (<span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span>) at
+certain times when it believes the engine may not be listening to user
+input (thinking or pondering).  WinBoard currently does this only when
+the engine is running remotely using the -firstHost or -secondHost
+feature, not when it is running locally.  You probably need to know
+only enough about this grungy feature to keep it from getting in your
+way.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+The <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span>s are basically tailored to the needs of GNU Chess 4
+on systems where its input polling code is broken or disabled.
+Because they work in a rather peculiar way, it is recommended that you
+either ignore <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span> by having your engine call
+<span class="enscript-keyword">&lt;tt&gt;</span>signal(SIGINT, SIG_IGN)<span class="enscript-keyword">&lt;/tt&gt;</span>, or disable it with the &quot;feature&quot;
+command.<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Here are details for the curious.  If xboard needs to send a command
+when it is the chess engine's move (such as before the &quot;?&quot; command), 
+it sends a <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span> first.  If xboard needs to send commands when it is
+not the chess engine's move, but the chess engine may be pondering
+(thinking on its opponent's time) or analyzing (analysis or analyze
+file mode), xboard sends a <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span> before the first such command only.
+Another <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span> is not sent until another move is made, even if xboard
+issues more commands.  This behavior is necessary for GNU Chess 4.  The
+first <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span> stops it from pondering until the next move, but on some
+systems, GNU Chess 4 will die if it receives a <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span> when not 
+actually thinking or pondering.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+There are two reasons why WinBoard does not send the Win32 equivalent
+of <span class="enscript-keyword">&lt;tt&gt;</span>SIGINT<span class="enscript-keyword">&lt;/tt&gt;</span> (which is called <span class="enscript-keyword">&lt;tt&gt;</span>CTRL_C_EVENT<span class="enscript-keyword">&lt;/tt&gt;</span>) to local
+engines.  First, the Win32 GNU Chess 4 port does not need it.  Second, I
+could not find a way to get it to work.  Win32 seems to be designed
+under the assumption that only console applications, not windowed
+applications, would ever want to send a <span class="enscript-keyword">&lt;tt&gt;</span>CTRL_C_EVENT<span class="enscript-keyword">&lt;/tt&gt;</span>.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;8&quot;</span><span class="enscript-keyword">&gt;</span>8. Commands from xboard to the engine<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+All commands from xboard to the engine end with a newline (\n), even
+where that is not explicitly stated.  All your output to xboard must
+be in complete lines; any form of prompt or partial line will cause
+problems.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+At the beginning of each game, xboard sends an initialization string.
+This is currently &quot;new\nrandom\n&quot; unless the user changes it with the
+initString or secondInitString option.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+xboard normally reuses the same chess engine process for multiple
+games.  At the end of a game, xboard will send the &quot;force&quot; command
+(see below) to make sure your engine stops thinking about the current
+position.  It will later send the initString again to start a new
+game.  If your engine can't play multiple games, you can disable reuse
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+either with the &quot;feature&quot; command (beginning in protocol version
+2; see below) or 
+<span class="enscript-keyword">&lt;/font&gt;</span>
+with xboard's -xreuse (or -xreuse2) command line
+option.  xboard will then ask the process to quit after each game and
+start a new process for the next game.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dl&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>xboard<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>This command will be sent once immediately after your engine
+process is started.  You can use it to put your engine into &quot;xboard
+mode&quot; if that is needed.  If your engine prints a prompt to ask for
+user input, you must turn off the prompt and output a newline when the
+&quot;xboard&quot; command comes in.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>protover N<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+Beginning in protocol version 2 (in which N=2), this command will
+be sent immediately after the &quot;xboard&quot; command.  If you receive some
+other command immediately after &quot;xboard&quot; (such as &quot;new&quot;), you can
+assume that protocol version 1 is in use.  The &quot;protover&quot; command is
+the only new command that xboard always sends in version 2.  All other
+new commands to the engine are sent only if the engine first enables
+them with the &quot;feature&quot; command.  Protocol versions will always be
+simple integers so that they can easily be compared.
+
+<span class="enscript-keyword">&lt;p&gt;</span>Your engine should reply to the protover command by sending the
+&quot;feature&quot; command (see below) with the list of non-default feature
+settings that you require, if any.
+
+<span class="enscript-keyword">&lt;p&gt;</span>Your engine should never refuse to run due to receiving a higher
+protocol version number than it is expecting!  New protocol versions
+will always be compatible with older ones by default; the larger
+version number is simply a hint that additional &quot;feature&quot; command
+options added in later protocol versions may be accepted.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>accepted<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>rejected<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+These commands may be sent to your engine in reply to the &quot;feature&quot;
+command; see its documentation below.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>new<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Reset the board to the standard chess starting position.  Set
+White on move.  Leave force mode and set the engine to play Black.
+Associate the engine's clock with Black and the opponent's clock with
+White.  Reset clocks and time controls to the start of a new game.
+Stop clocks.  Do not ponder on this move, even if pondering is on.
+Remove any search depth limit previously set by the sd command.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>variant VARNAME<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If the game is not standard chess, but a variant, this command is
+sent after &quot;new&quot; and before the first move or &quot;edit&quot; command.  Currently
+defined variant names are:
+
+<span class="enscript-keyword">&lt;table&gt;</span>
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>wildcastle<span class="enscript-keyword">&lt;td&gt;</span>Shuffle chess where king can castle from d file
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>nocastle<span class="enscript-keyword">&lt;td&gt;</span>Shuffle chess with no castling at all
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>fischerandom<span class="enscript-keyword">&lt;td&gt;</span>Fischer Random (not supported yet)
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>bughouse<span class="enscript-keyword">&lt;td&gt;</span>Bughouse, ICC/FICS rules
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>crazyhouse<span class="enscript-keyword">&lt;td&gt;</span>Crazyhouse, ICC/FICS rules
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>losers<span class="enscript-keyword">&lt;td&gt;</span>Win by losing all pieces or getting mated (ICC)
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>suicide<span class="enscript-keyword">&lt;td&gt;</span>Win by losing all pieces including king,
+or by having fewer pieces when one player has no legal moves (FICS)
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>giveaway<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;td&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>Win by losing all pieces including king,
+or by having no legal moves (ICC)<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>twokings<span class="enscript-keyword">&lt;td&gt;</span>Weird ICC wild 9
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>kriegspiel<span class="enscript-keyword">&lt;td&gt;</span>Kriegspiel (engines not supported)
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>atomic<span class="enscript-keyword">&lt;td&gt;</span>Atomic
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>3check<span class="enscript-keyword">&lt;td&gt;</span>Win by giving check 3 times
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>unknown<span class="enscript-keyword">&lt;td&gt;</span>Unknown variant (not supported)
+<span class="enscript-keyword">&lt;/table&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>quit<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>The chess engine should immediately exit.  This command is used
+when xboard is itself exiting, and also between games if the -xreuse
+command line option is given (or -xreuse2 for the second engine).
+See also <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#7&quot;</span><span class="enscript-keyword">&gt;</span>Signals<span class="enscript-keyword">&lt;/a&gt;</span> above.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>random<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>This command is specific to GNU Chess 4.  You can either ignore it
+completely (that is, treat it as a no-op) or implement it as GNU Chess
+does.  The command toggles &quot;random&quot; mode (that is, it sets random =
+!random).  In random mode, the engine adds a small random value to its
+evaluation function to vary its play.  The &quot;new&quot; command sets random
+mode off.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>force<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Set the engine to play neither color (&quot;force mode&quot;).  Stop clocks.
+The engine should check that moves received in force mode are legal
+and made in the proper turn, but should not think, ponder, or make
+moves of its own.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>go<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Leave force mode and set the engine to play the color that is on
+move.  Associate the engine's clock with the color that is on move,
+the opponent's clock with the color that is not on move.  Start the engine's
+clock.  Start thinking and eventually make a move.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>playother<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+(This command is new in protocol version 2.  It is not
+sent unless you enable it with the feature command.)
+Leave force mode and set the engine to play the color that is <span class="enscript-keyword">&lt;i&gt;</span>not<span class="enscript-keyword">&lt;/i&gt;</span> on
+move.  Associate the opponent's clock with the color that is on move,
+the engine's clock with the color that is not on move.  Start the opponent's
+clock.  If pondering is enabled, the engine should begin pondering.
+If the engine later receives a move, it should start thinking and eventually
+reply.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>white<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+(This command is obsolete as of protocol version 2, but is still
+sent in some situations to accommodate older engines unless you disable it 
+with the feature command.)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+Set White on move.  Set the engine to play Black.  Stop clocks.
+<span class="enscript-keyword">&lt;p&gt;</span>
+  
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>black<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+(This command is obsolete as of protocol version 2, but is still
+sent in some situations to accommodate older engines unless you disable it 
+with the feature command.)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+Set Black on move.  Set the engine to play White.  Stop clocks.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>level MPS BASE INC<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Set time controls.  See the <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#11&quot;</span><span class="enscript-keyword">&gt;</span>Time Control<span class="enscript-keyword">&lt;/a&gt;</span> section below.
+<span class="enscript-keyword">&lt;p&gt;</span>
+  
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>st TIME<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Set time controls.  See the <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#11&quot;</span><span class="enscript-keyword">&gt;</span>Time Control<span class="enscript-keyword">&lt;/a&gt;</span> section
+below. The commands &quot;level&quot; and &quot;st&quot; are not used together.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>sd DEPTH<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>The engine should limit its thinking to DEPTH ply.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>time N<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Set a clock that always belongs to the engine.  N is a number in
+  centiseconds (units of 1/100 second).  Even if the engine changes to
+  playing the opposite color, this clock remains with the engine.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>otim N<span class="enscript-keyword">&lt;/strong&gt;</span>
+
+<span class="enscript-keyword">&lt;dd&gt;</span>Set a clock that always belongs to the opponent.  N is a number in
+centiseconds (units of 1/100 second).  Even if the opponent changes to
+playing the opposite color, this clock remains with the opponent.
+<span class="enscript-keyword">&lt;p&gt;</span>
+If needed for purposes of board display in force mode (where the
+engine is not participating in the game) the time clock should be
+associated with the last color that the engine was set to play, the
+otim clock with the opposite color.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+Beginning in protocol version 2, if you can't handle the time and
+otim commands, you can use the &quot;feature&quot; command to disable them; see
+below.  
+<span class="enscript-keyword">&lt;/font&gt;</span>
+The following techniques from older protocol versions also
+work: You can ignore the time and otim commands (that is, treat them
+as no-ops), or send back &quot;Error (unknown command): time&quot; the first
+time you see &quot;time&quot;.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>MOVE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>See below for the syntax of moves.  If the move is illegal, print
+an error message; see the section &quot;<span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#9&quot;</span><span class="enscript-keyword">&gt;</span>Commands from the engine to
+xboard<span class="enscript-keyword">&lt;/a&gt;</span>&quot;.  If the move is legal and in turn, make it.  If not in force
+mode, stop the opponent's clock, start the engine's clock, start
+thinking, and eventually make a move.
+<span class="enscript-keyword">&lt;p&gt;</span>
+When xboard sends your engine a move, it normally sends coordinate
+algebraic notation.  Examples:
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;table&gt;</span>
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>Normal moves:<span class="enscript-keyword">&lt;td&gt;</span>e2e4
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>Pawn promotion:<span class="enscript-keyword">&lt;td&gt;</span>e7e8q
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>Castling:<span class="enscript-keyword">&lt;td&gt;</span>e1g1, e1c1, e8g8, e8c8
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>Bughouse/crazyhouse drop:<span class="enscript-keyword">&lt;td&gt;</span>P@h3
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>ICS Wild 0/1 castling:<span class="enscript-keyword">&lt;td&gt;</span>d1f1, d1b1, d8f8, d8b8
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>FischerRandom castling:<span class="enscript-keyword">&lt;td&gt;</span>O-O, O-O-O (oh, not zero)
+<span class="enscript-keyword">&lt;/table&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+Beginning in protocol version 2, you can use the feature command
+to select SAN (standard algebraic notation) instead; for example, e4,
+Nf3, exd5, Bxf7+, Qxf7#, e8=Q, O-O, or P@h3.  Note that the last form,
+P@h3, is a extension to the PGN standard's definition of SAN, which does
+not support bughouse or crazyhouse.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+xboard doesn't reliably detect illegal moves, because it does not keep
+track of castling unavailability due to king or rook moves, or en
+passant availability.  If xboard sends an illegal move, send back an
+error message so that xboard can retract it and inform the user; see
+the section &quot;<span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#9&quot;</span><span class="enscript-keyword">&gt;</span>Commands from the engine to xboard<span class="enscript-keyword">&lt;/a&gt;</span>&quot;.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>usermove MOVE<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+By default, moves are sent to the engine without a command name;
+the notation is just sent as a line by itself.
+Beginning in protocol version 2, you can use the feature command
+to cause the command name &quot;usermove&quot; to be sent before the move.
+Example: &quot;usermove e2e4&quot;.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>?<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Move now.  If your engine is thinking, it should move immediately;
+  otherwise, the command should be ignored (treated as a no-op).  It
+  is permissible for your engine to always ignore the ? command.  The
+  only bad consequence is that xboard's Move Now menu command will do
+  nothing.
+<span class="enscript-keyword">&lt;p&gt;</span>
+It is also permissible for your engine to move immediately if it gets
+any command while thinking, as long as it processes the command right
+after moving, but it's preferable if you don't do this.  For example,
+xboard may send post, nopost, easy, hard, force, quit,
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+or other commands
+<span class="enscript-keyword">&lt;/font&gt;</span>
+while the engine is on move.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>ping N<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+In this command, N is a decimal number.  When you receive the command,
+reply by sending the string <span class="enscript-keyword">&lt;strong&gt;</span>pong N<span class="enscript-keyword">&lt;/strong&gt;</span>, where N is the
+same number you received.  Important: You must not reply to a &quot;ping&quot;
+command until you have finished executing all commands that you
+received before it.  Pondering does not count; if you receive a ping
+while pondering, you should reply immediately and continue pondering.
+Because of the way xboard uses the ping command, if you implement the
+other commands in this protocol, you should never see a &quot;ping&quot; command
+when it is your move; however, if you do, you must not send the &quot;pong&quot;
+reply to xboard until after you send your move.  For example, xboard
+may send &quot;?&quot; immediately followed by &quot;ping&quot;.  If you implement the &quot;?&quot;
+command, you will have moved by the time you see the subsequent ping
+command.  Similarly, xboard may send a sequence like &quot;force&quot;, &quot;new&quot;,
+&quot;ping&quot;.  You must not send the pong response until after you have
+finished executing the &quot;new&quot; command and are ready for the new game to
+start.
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+The ping command is new in protocol version 2 and will not be sent
+unless you enable it with the &quot;feature&quot; command.  Its purpose is to
+allow several race conditions that could occur in previous versions of
+the protocol to be fixed, so it is highly recommended that you
+implement it.  It is especially important in simple engines that do
+not ponder and do not poll for input while thinking, but it is needed in all
+engines.  
+<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>draw<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>The engine's opponent offers the engine a draw.  To accept the
+draw, send &quot;offer draw&quot;.  To decline, ignore the offer (that is, send
+nothing).  If you're playing on ICS, it's possible for the draw offer
+to have been withdrawn by the time you accept it, so don't assume the
+game is over because you accept a draw offer.  Continue playing until
+xboard tells you the game is over.  See also &quot;offer draw&quot; below.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>result RESULT {COMMENT}<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>After the end of each game, xboard will send you a result command.
+You can use this command to trigger learning.  RESULT is either 1-0,
+0-1, 1/2-1/2, or *, indicating whether white won, black won, the game
+was a draw, or the game was unfinished.  The COMMENT string is purely
+a human-readable comment; its content is unspecified and subject to
+change.  In ICS mode, it is passed through from ICS uninterpreted.
+Example: <span class="enscript-keyword">&lt;pre&gt;</span>result 1-0 {White mates}<span class="enscript-keyword">&lt;/pre&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+Here are some notes on interpreting the &quot;result&quot; command.  Some apply
+only to playing on ICS (&quot;Zippy&quot; mode).
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+If you won but did not just play a mate, your opponent must have
+resigned or forfeited.  If you lost but were not just mated, you
+probably forfeited on time, or perhaps the operator resigned manually.
+If there was a draw for some nonobvious reason, perhaps your opponent
+called your flag when he had insufficient mating material (or vice
+versa), or perhaps the operator agreed to a draw manually.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+You will get a result command even if you already know the game ended
+-- for example, after you just checkmated your opponent.  In fact, if
+you send the &quot;RESULT {COMMENT}&quot; command (discussed below), you will
+simply get the same thing fed back to you with &quot;result&quot; tacked in
+front.  You might not always get a &quot;result *&quot; command, however.  In
+particular, you won't get one in local chess engine mode when the user
+stops playing by selecting Reset, Edit Game, Exit or the like.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>setboard FEN<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+The setboard command is the new way to set up positions, beginning
+in protocol version 2.  It is not used unless it has been selected
+with the feature command.  Here FEN is a position in Forsythe-Edwards
+Notation, as defined in the PGN standard.
+
+<span class="enscript-keyword">&lt;p&gt;</span><span class="enscript-keyword">&lt;i&gt;</span>Illegal positions:<span class="enscript-keyword">&lt;/i&gt;</span> Note that either setboard or edit can
+be used to send an illegal position to the engine.  The user can
+create any position with xboard's Edit Position command (even, say,
+an empty board, or a board with 64 white kings and no black ones).
+If your engine receives a position that it considers illegal, 
+I suggest that you send the response &quot;tellusererror Illegal position&quot;,
+and then respond to any attempted move with &quot;Illegal move&quot; until
+the next new, edit, or setboard command.<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>edit<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+The edit command is the old way to set up positions.  For compatibility
+with old engines, it is still used by default, but new engines may prefer
+to use the feature command (see below) to cause xboard to use setboard instead.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+The edit command puts the chess engine into a special mode, where
+it accepts the following subcommands:
+<span class="enscript-keyword">&lt;table&gt;</span>
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>c<span class="enscript-keyword">&lt;td&gt;</span>change current piece color, initially white
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>Pa4 (for example)<span class="enscript-keyword">&lt;td&gt;</span>place pawn of current color on a4
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>xa4 (for example)<span class="enscript-keyword">&lt;td&gt;</span>empty the square a4 (not used by xboard)
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>#<span class="enscript-keyword">&lt;td&gt;</span>clear board
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>.<span class="enscript-keyword">&lt;td&gt;</span>leave edit mode
+<span class="enscript-keyword">&lt;/table&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+See the Idioms section below for additional subcommands used in
+ChessBase's implementation of the protocol.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>The edit command does not change the side to move.  To set up a
+black-on-move position, xboard uses the following command sequence:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;pre&gt;</span>
+    new
+    force
+    a2a3
+    edit
+    <span class="enscript-keyword">&amp;lt;</span>edit commands<span class="enscript-keyword">&amp;gt;</span>
+    .
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+This sequence is used to avoid the &quot;black&quot; command, which is now
+considered obsolete and which many engines never did implement as 
+specified in this document.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+After an edit command is complete, if a king and a rook are on their
+home squares, castling is assumed to be available to them.  En passant
+capture is assumed to be illegal on the current move regardless of the
+positions of the pawns.  The clock for the 50 move rule starts at
+zero, and for purposes of the draw by repetition rule, no prior
+positions are deemed to have occurred.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>hint<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If the user asks for a hint, xboard sends your engine the command
+&quot;hint&quot;.  Your engine should respond with &quot;Hint: xxx&quot;, where xxx is a
+suggested move.  If there is no move to suggest, you can ignore the
+hint command (that is, treat it as a no-op).
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>bk<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If the user selects &quot;Book&quot; from the xboard menu, xboard will send
+your engine the command &quot;bk&quot;.  You can send any text you like as the
+response, as long as each line begins with a blank space or tab (\t)
+character, and you send an empty line at the end.  The text pops up in
+a modal information dialog.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>undo<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If the user asks to back up one move, xboard will send you the
+&quot;undo&quot; command.  xboard will not send this command without putting you
+in &quot;force&quot; mode first, so you don't have to worry about what should
+happen if the user asks to undo a move your engine made.  (GNU Chess 4
+actually switches to playing the opposite color in this case.)
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>remove<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If the user asks to retract a move, xboard will send you the
+&quot;remove&quot; command.  It sends this command only when the user is on
+move.  Your engine should undo the last two moves (one for each
+player) and continue playing the same color.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>hard<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Turn on pondering (thinking on the opponent's time, also known as
+&quot;permanent brain&quot;).  xboard will not make any assumption about what
+your default is for pondering or whether &quot;new&quot; affects this setting.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>easy<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Turn off pondering.
+<span class="enscript-keyword">&lt;p&gt;</span>
+  
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>post<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Turn on thinking/pondering output.  
+See <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#10&quot;</span><span class="enscript-keyword">&gt;</span>Thinking Output<span class="enscript-keyword">&lt;/a&gt;</span> section.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>nopost<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Turn off thinking/pondering output.
+<span class="enscript-keyword">&lt;p&gt;</span>
+  
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>analyze<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Enter analyze mode.  See <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#12&quot;</span><span class="enscript-keyword">&gt;</span>Analyze Mode<span class="enscript-keyword">&lt;/a&gt;</span> section.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>name X<span class="enscript-keyword">&lt;/strong&gt;</span> <span class="enscript-keyword">&lt;dd&gt;</span>This command informs the engine of its
+opponent's name.  When the engine is playing on a chess server, xboard
+obtains the opponent's name from the server. 
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+When the engine is
+playing locally against a human user, xboard obtains the user's login
+name from the local operating system.  When the engine is playing
+locally against another engine, xboard uses either the other engine's
+filename or the name that the other engine supplied in the myname
+option to the feature command.  By default, xboard uses the name
+command only when the engine is playing on a chess server.  Beginning
+in protocol version 2, you can change this with the name option to the
+feature command; see below.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>rating<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>In ICS mode, xboard obtains the ICS opponent's rating from the
+&quot;Creating:&quot; message that appears before each game.  (This message may
+not appear on servers using outdated versions of the FICS code.)  In
+Zippy mode, it sends these ratings on to the chess engine using the
+&quot;rating&quot; command.  The chess engine's own rating comes first, and if
+either opponent is not rated, his rating is given as 0.  
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+In the future this command may also be used in other modes, if ratings
+are known.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+Example: <span class="enscript-keyword">&lt;pre&gt;</span>rating 2600 1500<span class="enscript-keyword">&lt;/pre&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>ics HOSTNAME<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If HOSTNAME is &quot;-&quot;, the engine is playing against a local
+opponent; otherwise, the engine is playing on an Internet Chess Server
+(ICS) with the given hostname.  This command is new in protocol
+version 2 and is not sent unless the engine has enabled it with
+the &quot;feature&quot; command.  Example: &quot;ics freechess.org&quot;
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>computer<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>The opponent is also a computer chess engine.  Some engines alter
+their playing style when they receive this command.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>pause<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>resume<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>(These commands are new in protocol
+version 2 and will not be sent unless feature pause=1 is set.  At
+this writing, xboard actually does not use the commands at all, but it
+or other interfaces may use them in the future.)
+The &quot;pause&quot; command puts the engine into a special state where it
+does not think, ponder, or otherwise consume significant CPU time.
+The current thinking or pondering (if any) is suspended and both
+player's clocks are stopped.  The only command that the interface may
+send to the engine while it is in the paused state is &quot;resume&quot;.  The
+paused thinking or pondering (if any) resumes from exactly where it
+left off, and the clock of the player on move resumes running from
+where it stopped.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/dl&gt;</span>
+
+<span class="enscript-keyword">&lt;h3&gt;</span>Bughouse commands:<span class="enscript-keyword">&lt;/h3&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+xboard now supports bughouse engines when in Zippy mode.  See
+<span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;<a href="http://www.tim-mann.org/xboard/zippy.README">http://www.tim-mann.org/xboard/zippy.README</a>&quot;</span><span class="enscript-keyword">
+&gt;</span>zippy.README<span class="enscript-keyword">&lt;/a&gt;</span> for information on Zippy mode and how to turn on the
+bughouse support.  The bughouse move format is given above.  xboard
+sends the following additional commands to the engine when in bughouse
+mode.  
+Commands to inform your engine of the partner's game state may
+be added in the future.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dl&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>partner <span class="enscript-keyword">&amp;lt;</span>player<span class="enscript-keyword">&amp;gt;</span><span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&amp;lt;</span>player<span class="enscript-keyword">&amp;gt;</span> is now your partner for future games.  Example: <span class="enscript-keyword">&lt;pre&gt;</span>partner mann<span class="enscript-keyword">&lt;/pre&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>partner<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Meaning: You no longer have a partner.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>ptell <span class="enscript-keyword">&amp;lt;</span>text<span class="enscript-keyword">&amp;gt;</span><span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Your partner told you <span class="enscript-keyword">&amp;lt;</span>text<span class="enscript-keyword">&amp;gt;</span>, either with a ptell or an ordinary tell.  
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>holding [<span class="enscript-keyword">&amp;lt;</span>white<span class="enscript-keyword">&amp;gt;</span>] [<span class="enscript-keyword">&amp;lt;</span>black<span class="enscript-keyword">&amp;gt;</span>]<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>White currently holds <span class="enscript-keyword">&amp;lt;</span>white<span class="enscript-keyword">&amp;gt;</span>; black currently holds <span class="enscript-keyword">&amp;lt;</span>black<span class="enscript-keyword">&amp;gt;</span>.
+  Example: <span class="enscript-keyword">&lt;pre&gt;</span>holding [PPPRQ] []<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>holding [<span class="enscript-keyword">&amp;lt;</span>white<span class="enscript-keyword">&amp;gt;</span>] [<span class="enscript-keyword">&amp;lt;</span>black<span class="enscript-keyword">&amp;gt;</span>] <span class="enscript-keyword">&amp;lt;</span>color<span class="enscript-keyword">&amp;gt;</span><span class="enscript-keyword">&amp;lt;</span>piece<span class="enscript-keyword">&amp;gt;</span><span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>White currently holds <span class="enscript-keyword">&amp;lt;</span>white<span class="enscript-keyword">&amp;gt;</span>; black currently holds <span class="enscript-keyword">&amp;lt;</span>black<span class="enscript-keyword">&amp;gt;</span>, after
+  <span class="enscript-keyword">&amp;lt;</span>color<span class="enscript-keyword">&amp;gt;</span> acquired <span class="enscript-keyword">&amp;lt;</span>piece<span class="enscript-keyword">&amp;gt;</span>.   Example: <span class="enscript-keyword">&lt;pre&gt;</span>holding [PPPRQ] [R] BR<span class="enscript-keyword">&lt;/pre&gt;</span>
+<span class="enscript-keyword">&lt;/dl&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;9&quot;</span><span class="enscript-keyword">&gt;</span>9. Commands from the engine to xboard<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+In general, an engine should not send any output to xboard that is not
+described in this document.  As the protocol is extended, newer
+versions of xboard may recognize additional strings as commands that
+were previously not assigned a meaning.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dl&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>feature FEATURE1=VALUE1 FEATURE2=VALUE2 ...<span class="enscript-keyword">&lt;/strong&gt;</span> 
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+Beginning with version 2, the protocol includes the &quot;feature&quot;
+command, which lets your engine control certain optional protocol
+features.  Feature settings are written as FEATURE=VALUE, where
+FEATURE is a name from the list below and VALUE is the value to be
+assigned.  Features can take string, integer, or boolean values; the
+type of value is listed for each feature.  String values are written
+in double quotes (for example, <span class="enscript-keyword">&lt;tt&gt;</span>feature myname=&quot;Miracle Chess
+0.9&quot;<span class="enscript-keyword">&lt;/tt&gt;</span>), integers are written in decimal, and boolean values are
+written as 0 for false, 1 for true.  Any number of features can be set
+in one feature command, or multiple feature commands can be given.
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Your engine should send one or more feature commands immediately after
+receiving the &quot;protover&quot; command, since xboard needs to know the
+values of some features before sending further commands to the engine.
+Because engines that predate protocol version 2 do not send &quot;feature&quot;,
+xboard uses a timeout mechanism: when it first starts your engine, it
+sends &quot;xboard&quot; and &quot;protover N&quot;, then listens for feature commands for
+two seconds before sending any other commands.  To end this timeout
+and avoid the wait, set the feature &quot;done=1&quot; at the end of your last
+feature command.  To increase the timeout, if needed, set the feature
+&quot;done=0&quot; before your first feature command and &quot;done=1&quot; at the end.
+If needed, it is okay for your engine to set done=0 soon as it starts,
+even before it receives the xboard and protover commands.  This can be
+useful if your engine takes a long time to initialize itself.  It
+should be harmless even if you are talking to a (version 1) user
+interface that does not understand the &quot;feature&quot; command, since such
+interfaces generally ignore commands from the engine that they do not
+understand.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+The feature command is designed to let the protocol change without
+breaking engines that were written for older protocol versions.  When
+a new feature is added to the protocol, its default value is always
+chosen to be compatible with older versions of the protocol that did
+not have the feature.  Any feature that your engine does not set in a
+&quot;feature&quot; command retains its default value, so as the protocol
+changes, you do not have to change your engine to keep up with it
+unless you want to take advantage of a new feature.  Because some
+features are improvements to the protocol, while others are meant to
+cater to engines that do not implement all the protocol features, the
+recommended setting for a feature is not always the same as the
+default setting.  The listing below gives both default and recommended
+settings for most features.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+You may want to code your engine so as to be able to work with
+multiple versions of the engine protocol.  Protocol version 1 does not
+send the protover command and does not implement the feature command;
+if you send a feature command in protocol version 1, it will have no
+effect and there will be no response.  In protocol version 2 or later,
+each feature F that you set generates the response &quot;accepted F&quot; if the
+feature is implemented, or &quot;rejected F&quot; if it is not.  Thus an engine
+author can request any feature without having to keep track of which
+protocol version it was introduced in; you need only check whether the
+feature is accepted or rejected.  This mechanism also makes it
+possible for a user interface author to implement a subset of a
+protocol version by rejecting some features that are defined in that
+version; however, you should realize that engine authors are likely to
+code for xboard and may not be prepared to have a feature that they
+depend on be rejected.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Here are the features that are currently defined.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dl&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>ping<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 0, recommended 1)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If ping=1, xboard may use the protocol's new &quot;ping&quot; command;
+if ping=0, xboard will not use the command.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>setboard<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 0, recommended 1)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If setboard=1, xboard will use the protocol's new &quot;setboard&quot; command
+to set up positions; if setboard=0, it will use the older &quot;edit&quot; command.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>playother<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 0, recommended 1)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If playother=1, xboard will use the protocol's new &quot;playother&quot; command
+when appropriate; if playother=0, it will not use the command.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>san<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 0)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If san=1, xboard will send moves to the engine in standard algebraic
+notation (SAN); for example, Nf3.  If san=0, xboard will send moves in
+coordinate notation; for example, g1f3.  See MOVE in 
+<span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#8&quot;</span><span class="enscript-keyword">&gt;</span>section 8<span class="enscript-keyword">&lt;/a&gt;</span> above for more details of both kinds of notation.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>usermove<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 0)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If usermove=1, xboard will send moves to the engine with the
+command &quot;usermove MOVE&quot;; if usermove=0, xboard will send just the move,
+with no command name.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>time<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 1, recommended 1)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If time=1, xboard will send the &quot;time&quot; and &quot;otim&quot; commands to
+update the engine's clocks; if time=0, it will not.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>draw<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 1, recommended 1)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If draw=1, xboard will send the &quot;draw&quot; command if the engine's opponent
+offers a draw; if draw=0, xboard will not inform the engine about
+draw offers.  Note that if draw=1, you may receive a draw offer while you
+are on move; if this will cause you to move immediately, you should set
+draw=0.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>sigint<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 1)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If sigint=1, xboard may send SIGINT (the interrupt signal) to
+the engine as <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#7&quot;</span><span class="enscript-keyword">&gt;</span>section 7<span class="enscript-keyword">&lt;/a&gt;</span> above; if sigint=0, it will
+not.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>sigterm<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 1)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If sigterm=1, xboard may send SIGTERM (the termination signal) to
+the engine as <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#7&quot;</span><span class="enscript-keyword">&gt;</span>section 7<span class="enscript-keyword">&lt;/a&gt;</span> above; if sigterm=0, it will
+not.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>reuse<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 1, recommended 1) 
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If reuse=1, xboard may reuse your engine for multiple games.  If
+reuse=0 (or if the user has set the -xreuse option on xboard's command
+line), xboard will kill the engine process after every game and start
+a fresh process for the next game.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>analyze<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 1, recommended 1)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If analyze=0, xboard will not try to use the &quot;analyze&quot; command; it
+will pop up an error message if the user asks for analysis mode.  If
+analyze=1, xboard will try to use the command if the user asks for
+analysis mode.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>myname<span class="enscript-keyword">&lt;/strong&gt;</span> (string, default determined from engine filename)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+This feature lets you set the name that xboard will use for your
+engine in window banners, in the PGN tags of saved game files, and when
+sending the &quot;name&quot; command to another engine.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>variants<span class="enscript-keyword">&lt;/strong&gt;</span> (string, see text below)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+This feature indicates which chess variants your engine accepts.
+It should be a comma-separated list of variant names.  See the table
+under the &quot;variant&quot; command in <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#8&quot;</span><span class="enscript-keyword">&gt;</span>section 8<span class="enscript-keyword">&lt;/a&gt;</span> above.  If
+you do not set this feature, xboard will assume by default that your
+engine supports all variants.  (However, the -zippyVariants
+command-line option still limits which variants will be accepted in
+Zippy mode.)  It is recommended that you set this feature to the
+correct value for your engine (just &quot;normal&quot; in most cases) rather
+than leaving the default in place, so that the user will get an
+appropriate error message if he tries to play a variant that your
+engine does not support.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>colors<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 1, recommended 0) 
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If colors=1, xboard uses the obsolete &quot;white&quot; and &quot;black&quot;
+commands in a stylized way that works with most older chess engines
+that require the commands.  See the &quot;<span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;#13&quot;</span><span class="enscript-keyword">&gt;</span>Idioms<span class="enscript-keyword">&lt;/a&gt;</span>&quot; section
+below for details.  If colors=0, xboard does not use the &quot;white&quot; and
+&quot;black&quot; commands at all.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>ics<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 0)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If ics=1, xboard will use the protocol's new &quot;ics&quot; command
+to inform the engine of whether or not it is playing on a chess server;
+if ics=0, it will not.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>name<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, see text below)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If name=1, xboard will use the protocol's &quot;name&quot; command
+to inform the engine of the opponent's name; if name=0, it will not.
+By default, name=1 if the engine is playing on a chess server; name=0 if not.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>pause<span class="enscript-keyword">&lt;/strong&gt;</span> (boolean, default 0)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If pause=1, xboard may use the protocol's new &quot;pause&quot; command;
+if pause=0, xboard assumes that the engine does not support this command.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>done<span class="enscript-keyword">&lt;/strong&gt;</span> (integer, no default)
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+If you set done=1 during the initial two-second timeout after
+xboard sends you the &quot;xboard&quot; command, the
+timeout will end and xboard will not look for any more feature
+commands before starting normal operation.
+If you set done=0, the initial timeout is increased to one hour;
+in this case, you must set done=1 before xboard will enter normal operation.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/dl&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>Illegal move: MOVE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>Illegal move (REASON): MOVE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If your engine receives a MOVE command that is recognizably a move
+but is not legal in the current position, your engine must print an
+error message in one of the above formats so that xboard can pass the
+error on to the user and retract the move.  The (REASON) is entirely
+optional.  Examples:
+
+<span class="enscript-keyword">&lt;pre&gt;</span>
+  Illegal move: e2e4
+  Illegal move (in check): Nf3
+  Illegal move (moving into check): e1g1
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+Generally, xboard will never send an ambiguous move, so it does not 
+matter whether you respond to such a move with an Illegal move message 
+or an Error message.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>Error (ERRORTYPE): COMMAND<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If your engine receives a command it does not understand or does
+not implement, it should print an error message in the above format so
+that xboard can parse it.  Examples:
+<span class="enscript-keyword">&lt;pre&gt;</span>
+  Error (ambiguous move): Nf3
+  Error (unknown command): analyze
+  Error (command not legal now): undo
+  Error (too many parameters): level 1 2 3 4 5 6 7
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>move MOVE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Your engine is making the move MOVE.  Do not echo moves from
+xboard with this command; send only new moves made by the engine.
+
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>For the actual move text from your chess engine (in place of MOVE
+above), your move should be either
+<span class="enscript-keyword">&lt;ul&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span>in coordinate notation (e.g.,
+e2e4, e7e8q) with castling indicated by the King's two-square move (e.g.,
+e1g1), or
+<span class="enscript-keyword">&lt;li&gt;</span>in Standard Algebraic Notation (SAN) as defined in the
+Portable Game Notation standard (e.g, e4, Nf3, O-O, cxb5, Nxe4, e8=Q),
+with the extension piece@square (e.g., P@f7) to handle piece placement
+in bughouse and crazyhouse.
+<span class="enscript-keyword">&lt;/ul&gt;</span>
+xboard itself also accepts some variants of SAN, but for compatibility
+with non-xboard interfaces, it is best not to rely on this behavior.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>Warning: Even though all versions of this protocol specification
+have indicated that xboard accepts SAN moves, some non-xboard
+interfaces are known to accept only coordinate notation.  See the
+Idioms section for more information on the known limitations of some
+non-xboard interfaces.  It should be safe to send SAN moves if you
+receive a &quot;protover 2&quot; (or later) command from the interface, but
+otherwise it is best to stick to coordinate notation for maximum
+compatibility.  An even more conservative approach would be for your
+engine to send SAN to the interface only if you have set feature san=1
+(which causes the interface to send SAN to you) and have received
+&quot;accepted san&quot; in reply.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>RESULT {COMMENT}<span class="enscript-keyword">&lt;/strong&gt;</span> <span class="enscript-keyword">&lt;dd&gt;</span>When your engine detects
+that the game has ended by rule, your engine must output a line of the
+form &quot;RESULT {comment}&quot; (without the quotes), where RESULT is a PGN
+result code (1-0, 0-1, or 1/2-1/2), and comment is the reason.  Here
+&quot;by rule&quot; means that the game is definitely over because of what
+happened on the board.  In normal chess, this includes checkmate,
+stalemate, triple repetition, the 50 move rule, or insufficient
+material; it does not include loss on time or the like.
+Examples:
+<span class="enscript-keyword">&lt;pre&gt;</span>
+  0-1 {Black mates}
+  1-0 {White mates}
+  1/2-1/2 {Draw by repetition}
+  1/2-1/2 {Stalemate}
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+xboard relays the result to the user, the ICS, the other engine in Two
+Machines mode, and the PGN save file as required.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>resign<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If your engine wants to resign, it can send the command &quot;resign&quot;.
+Alternatively, it can use the &quot;RESULT {comment}&quot; command if the string
+&quot;resign&quot; is included in the comment; for example &quot;0-1 {White
+resigns}&quot;.  xboard relays the resignation to the user, the ICS, the
+other engine in Two Machines mode, and the PGN save file as required.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>offer draw<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>If your engine wants to offer a draw by agreement (as opposed to
+claiming a draw by rule), it can send the command &quot;offer draw&quot;.
+xboard relays the offer to the user, the ICS, the other engine in Two
+Machines mode, and the PGN save file as required.  In Machine White,
+Machine Black, or Two Machines mode, the offer is considered valid
+until your engine has made two more moves.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>tellopponent MESSAGE<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+This command lets the engine give a message to its opponent,
+independent of whether the opponent is a user on the local machine or
+a remote ICS user (Zippy mode).  MESSAGE consists of any characters,
+including whitespace, to the end of the line.  When the engine is
+playing against a user on the local machine, xboard pops up an
+information dialog containing the message.  When the engine is playing
+against an opponent on the ICS (Zippy mode), xboard sends &quot;say
+MESSAGE\n&quot; to the ICS.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>tellothers MESSAGE<span class="enscript-keyword">&lt;/strong&gt;</span> 
+<span class="enscript-keyword">&lt;dd&gt;</span>This command lets the engine give a message to people watching the
+game other than the engine's opponent.  MESSAGE consists of any
+characters, including whitespace, to the end of the line.  When the
+engine is playing against a user on the local machine, this command
+does nothing.  When the engine is playing against an opponent on the
+ICS (Zippy mode), xboard sends &quot;whisper MESSAGE\n&quot; to the ICS.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>tellall MESSAGE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>This command lets the engine give a message to its opponent and
+other people watching the game, 
+independent of whether the opponent is a user on the local machine or
+a remote ICS user (Zippy mode).  MESSAGE consists of any characters,
+including whitespace, to the end of the line.  When the engine is
+playing against a user on the local machine, xboard pops up an
+information dialog containing the message.  When the engine is playing
+against an opponent on the ICS (Zippy mode), xboard sends &quot;kibitz
+MESSAGE\n&quot; to the ICS.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>telluser MESSAGE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>xboard pops up an information dialog containing the message.
+MESSAGE consists of any characters, including whitespace, to the end
+of the line.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>tellusererror MESSAGE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>xboard pops up an error dialog containing the message.
+MESSAGE consists of any characters, including whitespace, to the end
+of the line.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>askuser REPTAG MESSAGE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Here REPTAG is a string containing no whitespace, and MESSAGE
+consists of any characters, including whitespace, to the end of the
+line.  xboard pops up a question dialog that says MESSAGE and
+has a typein box.  If the user types in &quot;bar&quot;, xboard sends &quot;REPTAG
+bar&quot; to the engine.  The user can cancel the dialog and send nothing.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>tellics MESSAGE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>In Zippy mode, xboard sends &quot;MESSAGE\n&quot; to ICS.  MESSAGE consists
+of any characters, including whitespace, to the end of the line.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>tellicsnoalias MESSAGE<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+In Zippy mode, xboard sends &quot;xMESSAGE\n&quot; to ICS, where &quot;x&quot; is a
+character that prevents the ICS from expanding command aliases, if
+xboard knows of such a character.  (On chessclub.com and chess.net,
+&quot;/&quot; is used; on freechess.org, &quot;$&quot; is used.)  MESSAGE consists of any
+characters, including whitespace, to the end of the line.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/dl&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;10&quot;</span><span class="enscript-keyword">&gt;</span>10. Thinking Output<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+If the user asks your engine to &quot;show thinking&quot;, xboard sends your
+engine the &quot;post&quot; command.  It sends &quot;nopost&quot; to turn thinking off.
+In post mode, your engine sends output lines to show the progress of
+its thinking.  The engine can send as many or few of these lines as it
+wants to, whenever it wants to.  Typically they would be sent when the
+PV (principal variation) changes or the depth changes.  The thinking
+output should be in the following format:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;pre&gt;</span>ply score time nodes pv<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+Where:
+<span class="enscript-keyword">&lt;table&gt;</span>
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>ply<span class="enscript-keyword">&lt;td&gt;</span>Integer giving current search depth.
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>score<span class="enscript-keyword">&lt;td&gt;</span>Integer giving current evaluation in centipawns.
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>time<span class="enscript-keyword">&lt;td&gt;</span>Current search time in centiseconds (ex:
+1028 = 10.28 seconds).
+
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>nodes<span class="enscript-keyword">&lt;td&gt;</span>Nodes searched.
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>pv<span class="enscript-keyword">&lt;td&gt;</span>Freeform text giving current &quot;best&quot; line.
+You can continue the pv onto another line if you start each
+continuation line with at least four space characters.
+<span class="enscript-keyword">&lt;/table&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Example:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;pre&gt;</span>  9 156 1084 48000 Nf3 Nc6 Nc3 Nf6<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Meaning:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+9 ply, score=1.56, time = 10.84 seconds, nodes=48000, 
+PV = &quot;Nf3 Nc6 Nc3 Nf6&quot;
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Longer example from actual Crafty output:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;pre&gt;</span>
+  4    109      14   1435  1. e4 d5 2. Qf3 dxe4 3. Qxe4 Nc6
+  4    116      23   2252  1. Nf3 Nc6 2. e4 e6
+  4    116      27   2589  1. Nf3 Nc6 2. e4 e6
+  5    141      44   4539  1. Nf3 Nc6 2. O-O e5 3. e4
+  5    141      54   5568  1. Nf3 Nc6 2. O-O e5 3. e4
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+You can use the PV to show other things; for instance, while in book,
+Crafty shows the observed frequency of different reply moves in its
+book.  In situations like this where your engine is not really
+searching, start the PV with a '(' character:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;pre&gt;</span>
+  0      0       0      0  (e4 64%, d4 24%)
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+GNU Chess output is very slightly different.  The ply number is
+followed by an extra nonblank character, and the time is in seconds,
+not hundredths of seconds.  For compatibility, xboard accepts the
+extra character and takes it as a flag indicating the different time
+units.  Example:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;pre&gt;</span>
+ 2.     14    0       38   d1d2  e8e7 
+ 3+     78    0       65   d1d2  e8e7  d2d3 
+ 3<span class="enscript-keyword">&amp;     14    0       89   d1d2  e8e7  d2d3 
+ 3&amp;     76    0      191   d1e2  e8e7  e2e3 
+ 3.     76    0      215   d1e2  e8e7  e2e3 
+ 4&amp;     15    0      366   d1e2  e8e7  e2e3  e7e6 
+ 4.     15    0      515   d1e2  e8e7  e2e3  e7e6 
+ 5+     74    0      702   d1e2  f7f5  e2e3  e8e7  e3f4 
+ 5&amp;     71    0     1085   d1e2  e8e7  e2e3  e7e6  e3f4 
+ 5.     71    0     1669   d1e2  e8e7  e2e3  e7e6  e3f4 
+ 6&amp;     48    0     3035   d1e2  e8e7  e2e3  e7e6  e3e4  f7f5  e4d4 
+ 6.     48    0     3720   d1e2  e8e7  e2e3  e7e6  e3e4  f7f5  e4d4 
+ 7&amp;     48    0     6381   d1e2  e8e7  e2e3  e7e6  e3e4  f7f5  e4d4 
+ 7.     48    0    10056   d1e2  e8e7  e2e3  e7e6  e3e4  f7f5  e4d4 
+ 8&amp;     66    1    20536   d1e2  e8e7  e2e3  e7e6  e3d4  g7g5  a2a4  f7f5 
+ 8.     66    1    24387   d1e2  e8e7  e2e3  e7e6  e3d4  g7g5  a2a4  f7f5 
+ 9&amp;     62    2    38886   d1e2  e8e7  e2e3  e7e6  e3d4  h7h5  a2a4  h5h4 
+                           d4e4 
+ 9.     62    4    72578   d1e2  e8e7  e2e3  e7e6  e3d4  h7h5  a2a4  h5h4 
+                           d4e4 
+10&amp;     34    7   135944   d1e2  e8e7  e2e3  e7e6  e3d4  h7h5  c2c4  h5h4 
+                           d4e4  f7f5  e4f4 
+10.     34    9   173474   d1e2  e8e7  e2e3  e7e6  e3d4  h7h5  c2c4  h5h4 
+                           d4e4  f7f5  e4f4 
+&lt;/pre&gt;
+
+&lt;p&gt;If your engine is pondering (thinking on its opponent's time) in post
+mode, it can show its thinking then too.  In this case your engine may
+omit the hint move (the move it is assuming its opponent will make)
+from the thinking lines &lt;em&gt;if and only if&lt;/em&gt; it sends xboard the move in
+the usual &quot;Hint: xxx&quot; format before sending the first line.
+&lt;/p&gt;
+
+&lt;h2&gt;&lt;a name=&quot;11&quot;&gt;11. Time control&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;
+xboard supports three styles of time control: conventional chess clocks,
+the ICS-style incremental clock, and an exact number of seconds per move.
+&lt;/p&gt;
+
+&lt;p&gt;In conventional clock mode, every time control period is the same.
+That is, if the time control is 40 moves in 5 minutes, then after each
+side has made 40 moves, they each get an additional 5 minutes, and so
+on, ad infinitum.  At some future time it would be nice to support a
+series of distinct time controls.  This is very low on my personal
+priority list, but code donations to the xboard project are accepted,
+so feel free to take a swing at it.  I suggest you talk to me first,
+though.
+&lt;/p&gt;
+
+&lt;p&gt;
+The command to set a conventional time control looks like this:
+&lt;/p&gt;
+
+&lt;pre&gt;
+  level 40 5 0
+  level 40 0:30 0
+&lt;/pre&gt;
+
+&lt;p&gt;
+The 40 means that there are 40 moves per time control.  The 5 means
+there are 5 minutes in the control.  In the second example, the 0:30
+means there are 30 seconds.  The final 0 means that we are in
+conventional clock mode.
+&lt;/p&gt;
+
+&lt;p&gt;
+The command to set an incremental time control looks like this:
+&lt;/p&gt;
+
+&lt;pre&gt;
+  level 0 2 12
+&lt;/pre&gt;
+
+&lt;p&gt;
+Here the 0 means &quot;play the whole game in this time control period&quot;,
+the 2 means &quot;base=2 minutes&quot;, and the 12 means &quot;inc=12 seconds&quot;.  As
+in conventional clock mode, the second argument to level can be in
+minutes and seconds.
+&lt;/p&gt;
+
+&lt;p&gt;
+At the start of the game, each player's clock is set to base minutes.
+Immediately after a player makes a move, inc seconds are added to his
+clock.  A player's clock counts down while it is his turn.  Your flag
+can be called whenever your clock is zero or negative.  (Your clock
+can go negative and then become positive again because of the
+increment.)
+&lt;/p&gt;
+
+&lt;p&gt;
+A special rule on some ICS implementations: if you ask for a game with
+base=0, the clocks really start at 10 seconds instead of 0.  xboard
+itself does not know about this rule, so it passes the 0 on to the
+engine instead of changing it to 0:10.
+&lt;/p&gt;
+
+&lt;p&gt;
+ICS also has time odds games.  With time odds, each player has his own
+(base, inc) pair, but otherwise things work the same as in normal
+games.  The Zippy xboard accepts time odds games but ignores the fact
+that the opponent's parameters are different;</span> this is perhaps not
+quite the right thing to do, but gnuchess doesn't understand time
+odds.  Time odds games are always unrated.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+The command to set an exact number of seconds per move looks like this:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;pre&gt;</span>
+  st 30
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+This means that each move must be made in at most 30 seconds.  Time not used
+on one move does not accumulate for use on later moves.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;12&quot;</span><span class="enscript-keyword">&gt;</span>12. Analyze Mode<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>xboard supports analyzing fresh games, edited positions, and games
+from files.  However, all of these look the same from the chess
+engine's perspective. Basically, the engine just has to respond to the
+&quot;analyze&quot; command.  
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+Beginning in protocol version 2,
+if your engine does not support analyze mode, it should use
+the feature command to set analyze=0.  
+<span class="enscript-keyword">&lt;/font&gt;</span>
+The older method of
+printing the error message &quot;Error (unknown command): analyze&quot; in
+response to the &quot;analyze&quot; command will also work, however.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+To enter analyze mode, xboard sends the command sequence &quot;post&quot;, &quot;analyze&quot;.  
+Analyze mode in your engine should be
+similar to force mode, except that your engine thinks about what move
+it would make next if it were on move.  Your engine should accept the
+following commands while in analyze mode:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;ul&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span>Any legal move, as in force mode
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>undo<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&amp;nbsp;</span><span class="enscript-keyword">&amp;nbsp;</span> Back up one move and analyze previous position.
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>new<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&amp;nbsp;</span><span class="enscript-keyword">&amp;nbsp;</span> Reset position to start of game but stay in analyze mode.
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>setboard<span class="enscript-keyword">&lt;/strong&gt;</span> if you have set feature setboard=1; otherwise <span class="enscript-keyword">&lt;strong&gt;</span>edit<span class="enscript-keyword">&lt;/strong&gt;</span>.  Exiting edit mode returns to analyze mode.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>exit<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&amp;nbsp;</span><span class="enscript-keyword">&amp;nbsp;</span> Leave analyze mode.
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>.<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&amp;nbsp;</span><span class="enscript-keyword">&amp;nbsp;</span> Send a search status update (optional); see below.
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>bk<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&amp;nbsp;</span><span class="enscript-keyword">&amp;nbsp;</span> Show book moves from this position,
+if any; see above.<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;li&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;strong&gt;</span>hint<span class="enscript-keyword">&lt;/strong&gt;</span><span class="enscript-keyword">&amp;nbsp;</span><span class="enscript-keyword">&amp;nbsp;</span> Show the predicted move from this
+position, if any; see above.<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/ul&gt;</span>
+  
+<span class="enscript-keyword">&lt;p&gt;</span>
+If the user selects &quot;Periodic Updates&quot;, xboard will send the string
+&quot;.\n&quot; to the chess engine periodically during analyze mode, unless the
+last PV received began with a '(' character.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+The chess engine should respond to &quot;.\n&quot; with a line like this:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;pre&gt;</span>
+stat01: time nodes ply mvleft mvtot <span class="enscript-keyword">&lt;font color=red&gt;</span>mvname<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+Where:
+<span class="enscript-keyword">&lt;table&gt;</span>
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>time<span class="enscript-keyword">&lt;td&gt;</span>Elapsed search time in centiseconds (ie: 567 = 5.67 seconds).
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>nodes<span class="enscript-keyword">&lt;td&gt;</span>Nodes searched so far.
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>ply<span class="enscript-keyword">&lt;td&gt;</span>Search depth so far.
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>mvleft<span class="enscript-keyword">&lt;td&gt;</span>Number of moves left to consider at this depth.
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>mvtot<span class="enscript-keyword">&lt;td&gt;</span>Total number of moves to consider.
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>mvname<span class="enscript-keyword">&lt;/font&gt;</span><span class="enscript-keyword">&lt;td&gt;</span><span class="enscript-keyword">&lt;font color=red&gt;</span>
+Move currently being considered (SAN or coordinate notation).  Optional;
+added in protocol version 2.<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/table&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Examples:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+<span class="enscript-keyword">&lt;pre&gt;</span>
+  stat01: 1234 30000 7 5 30
+  stat01: 1234 30000 7 5 30 Nf3
+<span class="enscript-keyword">&lt;/pre&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Meaning:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>After 12.34 seconds, I've searched 7 ply/30000 nodes, there are a
+  total of 30 legal moves, and I have 5 more moves to search
+  before going to depth 8.  In the second example, of the 30 legal
+  moves, the one I am currently searching is Nf3.<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Implementation of the &quot;.&quot; command is optional. If the engine does not
+respond to the &quot;.&quot; command with a &quot;stat01...&quot; line, xboard will stop
+sending &quot;.&quot;  commands.  If the engine does not implement this command,
+the analysis window will use a shortened format to display the engine
+info.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+To give the user some extra information, the chess engine can output
+the strings &quot;++\n&quot; and &quot;--\n&quot;, to indicate that the current search is
+failing high or low, respectively.  You don't have to send anything
+else to say &quot;Okay, I'm not failing high/low anymore.&quot;  xboard will
+figure this out itself.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;h2&gt;</span><span class="enscript-keyword">&lt;a name=</span><span class="enscript-string">&quot;13&quot;</span><span class="enscript-keyword">&gt;</span>13. Idioms and backward compatibility features<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/h2&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Some engines have variant interpretations of the force/go/white/black,
+time/otim, and hard/easy command sets.  
+In order to accommodate these older engines, xboard uses these commands
+only according to the stylized patterns (&quot;idioms&quot;) given in this section.
+The obsolete white and black commands
+have historically been particularly troublesome, and it is recommended
+that new engines set the feature colors=0 and/or ignore the commands.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;dl&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>time N<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>otim N<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>MOVE<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Sent when the opponent makes a move and the engine is already
+playing the opposite color.
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>white<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>go<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Sent when the engine is in force mode or playing Black but should
+switch to playing White.  This sequence is sent only when White is
+already on move.  
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+If you set the feature colors=0, &quot;white&quot; is not sent.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>black<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>go<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Sent when the engine is in force mode or playing White but should
+switch to playing Black.  This sequence is sent only when Black is
+already on move.  
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+If you set the feature colors=0, &quot;black&quot; is not sent.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>white<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>time N<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>otim N<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>black<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>go<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Sent when Black is on move, the engine is in force mode or playing
+White, and the engine's clock needs to be updated before it starts
+playing.  
+The initial &quot;white&quot; is a kludge to accommodate GNU Chess
+4's variant interpretation of these commands.  
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+If you set the feature colors=0, &quot;white&quot; and &quot;black&quot; are not sent.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>black<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>time N<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>otim N<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>white<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>go<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Sent when White is on move, the engine is in force mode or playing
+Black, and the engine's clock needs to be updated before it starts
+playing.  See previous idiom.  
+The initial &quot;black&quot; is a kludge to accommodate GNU Chess
+4's variant interpretation of these commands.  
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+If you set the feature colors=0, &quot;black&quot; and &quot;white&quot; are not sent.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>hard<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dt&gt;</span><span class="enscript-keyword">&lt;strong&gt;</span>easy<span class="enscript-keyword">&lt;/strong&gt;</span>
+<span class="enscript-keyword">&lt;dd&gt;</span>Sent in sequence to turn off pondering if xboard is not sure
+whether it is on.  When xboard is sure, it will send &quot;hard&quot; or &quot;easy&quot;
+alone.  xboard does this because &quot;easy&quot; is a toggle in GNU Chess 4 but
+&quot;hard&quot; is an absolute on.
+
+<span class="enscript-keyword">&lt;/dl&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+To support older engines, certain additional commands from the engine
+to xboard are also recognized.  (These are commands by themselves, not
+values to be placed in the comment field of the PGN result code.)
+These forms are not recommended for new engines; use the PGN result
+code commands or the resign command instead.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;table&gt;</span>
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>Command              <span class="enscript-keyword">&lt;th&gt;</span>Interpreted as
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>White resigns        <span class="enscript-keyword">&lt;td&gt;</span>0-1 {White resigns}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>Black resigns        <span class="enscript-keyword">&lt;td&gt;</span>1-0 {Black resigns}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>White                <span class="enscript-keyword">&lt;td&gt;</span>1-0 {White mates}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>Black                <span class="enscript-keyword">&lt;td&gt;</span>0-1 {Black mates}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>Draw                 <span class="enscript-keyword">&lt;td&gt;</span>1/2-1/2 {Draw}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>computer mates       <span class="enscript-keyword">&lt;td&gt;</span>1-0 {White mates} or 0-1 {Black mates}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>opponent mates       <span class="enscript-keyword">&lt;td&gt;</span>1-0 {White mates} or 0-1 {Black mates}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>computer resigns     <span class="enscript-keyword">&lt;td&gt;</span>0-1 {White resigns} or 1-0 {Black resigns}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>game is a draw       <span class="enscript-keyword">&lt;td&gt;</span>1/2-1/2 {Draw}
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>checkmate            <span class="enscript-keyword">&lt;td&gt;</span>1-0 {White mates} or 0-1 {Black mates}
+<span class="enscript-keyword">&lt;/table&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Commands in the above table are recognized if they begin a line and
+arbitrary characters follow, so (for example) &quot;White mates&quot; will be
+recognized as &quot;White&quot;, and &quot;game is a draw by the 50 move rule&quot; will
+be recognized as &quot;game is a draw&quot;.  All the commands are
+case-sensitive.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+An alternative move syntax is also recognized:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;table&gt;</span>
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;th&gt;</span>Command              <span class="enscript-keyword">&lt;th&gt;</span>Interpreted as
+<span class="enscript-keyword">&lt;tr align=</span><span class="enscript-string">&quot;left&quot;</span><span class="enscript-keyword">&gt;</span><span class="enscript-keyword">&lt;td&gt;</span>NUMBER ... MOVE      <span class="enscript-keyword">&lt;td&gt;</span>move MOVE
+<span class="enscript-keyword">&lt;/table&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Here NUMBER means any string of decimal digits, optionally ending in a
+period.  MOVE is any string containing no whitespace.  In this command
+format, xboard requires the &quot;...&quot; even if your engine is playing
+White.  A command of the form NUMBER MOVE will be ignored.  This odd
+treatment of the commands is needed for compatibility with gnuchessx.
+The original reasons for it are lost in the mists of time, but I
+suspect it was originally a bug in the earliest versions of xboard,
+before I started working on it, which someone &quot;fixed&quot; in the wrong
+way, by creating a special version of gnuchess (gnuchessx) instead of
+changing xboard.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+Any line that contains the words &quot;offer&quot; and &quot;draw&quot; is recognized as
+&quot;offer draw&quot;.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+The &quot;Illegal move&quot; message is recognized even if spelled &quot;illegal
+move&quot; and even if the colon (&quot;:&quot;) is omitted.  This accommodates GNU
+Chess 4, which prints messages like &quot;Illegal move (no matching
+move)e2e4&quot;, and old versions of Crafty, which print just &quot;illegal move&quot;.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+In Zippy mode, for compatibility with older versions of Crafty,
+xboard passes through to ICS any line that begins &quot;kibitz&quot;, &quot;whisper&quot;,
+&quot;tell&quot;, or &quot;draw&quot;.  Do not use this feature in new code.  Instead, use the
+commands &quot;tellall&quot;, &quot;tellothers&quot;, &quot;tellopponent&quot;, &quot;tellics&quot; (if needed),
+&quot;1/2-1/2 {COMMENT}&quot;, or &quot;offer draw&quot;, as appropriate.
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+If the engine responds to the &quot;sd DEPTH&quot; command with an error message
+indicating the command is not supported (such as &quot;Illegal move: sd&quot;),
+xboard sets an internal flag and subsequently uses the command
+&quot;depth\nDEPTH&quot; instead, for the benefit of GNU Chess 4.  Note the
+newline in the middle of this command!  New engines should not rely on
+this feature.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+If the engine responds to the &quot;st TIME&quot; command with an error message
+indicating the command is not supported (such as &quot;Illegal move: st&quot;),
+xboard sets an internal flag and subsequently uses the command &quot;level
+1 TIME&quot; instead, for the benefit of GNU Chess 4.  Note that this is
+not a standard use of the level command, as TIME seconds are not added
+after each player makes 1 move; rather, each move is made in at most
+TIME seconds.  New engines should not implement or rely on this
+feature.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+<span class="enscript-keyword">&lt;p&gt;</span>
+In support of the -firstHost/-secondHost features, which allow a chess
+engine to be run on another machine using the rsh protocol, xboard recognizes
+error messages that are likely to come from rsh as fatal errors.  The following
+messages are currently recognized:
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;blockquote&gt;</span>
+unknown host<span class="enscript-keyword">&lt;br&gt;</span>
+No remote directory<span class="enscript-keyword">&lt;br&gt;</span>
+not found<span class="enscript-keyword">&lt;br&gt;</span>
+No such file<span class="enscript-keyword">&lt;br&gt;</span>
+can't alloc<span class="enscript-keyword">&lt;br&gt;</span>
+Permission denied<span class="enscript-keyword">&lt;br&gt;</span>
+<span class="enscript-keyword">&lt;/blockquote&gt;</span>
+<span class="enscript-keyword">&lt;/font&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+ChessBase/Fritz now implements the xboard/winboard protocol and can use
+WinBoard-compatible engines in its GUI.  ChessBase's version of the
+protocol is generally the same as version 1, except that they have
+added the commands <span class="enscript-keyword">&lt;strong&gt;</span>fritz<span class="enscript-keyword">&lt;/strong&gt;</span>, <span class="enscript-keyword">&lt;strong&gt;</span>reset<span class="enscript-keyword">&lt;/strong&gt;</span>, and
+<span class="enscript-keyword">&lt;strong&gt;</span>ponder<span class="enscript-keyword">&lt;/strong&gt;</span>, and the edit subcommands
+<span class="enscript-keyword">&lt;strong&gt;</span>castle<span class="enscript-keyword">&lt;/strong&gt;</span> and <span class="enscript-keyword">&lt;strong&gt;</span>ep<span class="enscript-keyword">&lt;/strong&gt;</span>.  If you want your
+engine to work well with the ChessBase/Fritz GUI, you may need to
+implement these additional commands, and you should also be aware of
+the peculiar way that ChessBase uses the protocol.  See their <span class="enscript-keyword">&lt;a
+href=</span><span class="enscript-string">&quot;<a href="http://www.chessbase.com/Products/engines/winboard/tech.htm">http://www.chessbase.com/Products/engines/winboard/tech.htm</a>&quot;</span><span class="enscript-keyword">
+&gt;</span>web page<span class="enscript-keyword">&lt;/a&gt;</span> for documentation.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;p&gt;</span>
+<span class="enscript-keyword">&lt;font color=red&gt;</span>
+ChessMaster 8000 also implements version 1 of the xboard/winboard
+protocol and can use WinBoard-compatible engines.  The original
+release of CM8000 also has one additional restriction: only pure
+coordinate notation (e.g., e2e4) is accepted in the move command.  A
+patch to correct this should be available from The Learning Company
+(makers of CM8000) in February 2001.
+<span class="enscript-keyword">&lt;/font&gt;</span>
+<span class="enscript-keyword">&lt;/p&gt;</span>
+
+<span class="enscript-keyword">&lt;hr noshade size=</span><span class="enscript-string">&quot;2&quot;</span><span class="enscript-keyword">&gt;</span>
+<span class="enscript-keyword">&lt;address&gt;</span>converted to HTML by <span class="enscript-keyword">&lt;a href=</span><span class="enscript-string">&quot;<a href="http://www.jakob.at/steffen/">http://www.jakob.at/steffen/</a>&quot;</span><span class="enscript-keyword">&gt;</span>Steffen A. Jakob<span class="enscript-keyword">&lt;/a&gt;</span><span class="enscript-keyword">&lt;/address&gt;</span>
+<span class="enscript-keyword">&lt;/body&gt;</span>
+<span class="enscript-keyword">&lt;/html&gt;</span>
+</pre>
+<hr />
+</body></html>

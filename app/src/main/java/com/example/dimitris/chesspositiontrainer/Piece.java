@@ -52,14 +52,4 @@ public class Piece {
         }
     }
 
-    public static Piece create(String pieceType){
-        Piece piece = new NullPiece();
-        try {
-            piece =  (Piece) Class.forName(pieceType).newInstance();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-        return piece;
-    }
-
 }

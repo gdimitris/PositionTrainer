@@ -15,11 +15,11 @@ import static junit.framework.TestCase.assertEquals;
 @Config(constants = BuildConfig.class, emulateSdk = 21)
 public class NullPieceTests{
 
-    private NullPiece nullPiece;
+    private Piece nullPiece;
 
     @Before
     public void setUp() throws Exception {
-        nullPiece = new NullPiece();
+        nullPiece = Piece.create('?');
     }
 
     @Test
